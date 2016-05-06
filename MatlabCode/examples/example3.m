@@ -18,11 +18,26 @@ add_training_data(project); %Look here for details on creating traing data
 fprintf('done. [%6.02fs]\n', toc(prepTrainTime));
 
 %% Create test data for example3
-example3Files = dir( fullfile( 'example3_data', '*.jpg') ); %Get listing of all images
-imgExample3Cell = cell(numel(example3Files),1); %Initialize image cell
-for i=1:numel(example3Files) %Read all images as doubles
-    imgExample3Cell{i} = im2double(imread(fullfile('example3_data',example3Files(i).name)));
+readerObj = VideoReader(fullfile('example3_data', 'Glassboy-HD.mp4'));
+%writerObj = VideoWriter('C:\Users\alebios2\Documents\depthtransfer\MatlabCode\Glassboy-HD.avi','Uncompressed AVI');
+
+%open AVI file for writing
+%open(writerObj);
+fprintf('num frames [%d]\n', readerObj.NumberOfFrames);
+%read and write each frame
+imgExample3Cell = cell(numel(readerObj.NumberOfFrames),1); %Initialize image cell
+for k = 1:40%readerObj.NumberOfFrames
+   img = read(readerObj,k);
+   imgExample3Cell{k} = im2double(img);
+   %writeVideo(writerObj,img);
 end
+
+%close(writerObj);
+% example3Files = dir( fullfile( 'example3_data', '*.jpg') ); %Get listing of all images
+% imgExample3Cell = cell(numel(example3Files),1); %Initialize image cell
+% for i=1:numel(example3Files) %Read all images as doubles
+%     imgExample3Cell{i} = im2double(imread(fullfile('example3_data',example3Files(i).name)));
+% end
 imgExample3 = cell2mat(reshape(imgExample3Cell,1,1,1,[])); %Convert cell -> 4D array
 %Add data (unless it already exists from a previous run)
 if( ~exist(fullfile(project.path.data,'example3','001'), 'dir') )
@@ -54,6 +69,6 @@ depthEst = depthTransfer(project, testFile, trainFiles, depthPrior, motionFunc);
 imgs = loadData(fullfile(project.path.data,'example3'),'001', [project.h,project.w]);
 NdepthEst = repmat(imnormalize(depthEst),[1,1,3,1]); %Normalize/add channels for visualization
 figure('Name','Input images and estimated depth'),
-imshow([imgs(:,:,:,9), imgs(:,:,:,18), imgs(:,:,:,27); ...
-        NdepthEst(:,:,:,9), NdepthEst(:,:,:,18), NdepthEst(:,:,:,27)]);
+%imshow([imgs(:,:,:,9), imgs(:,:,:,18), imgs(:,:,:,27); ...
+%        NdepthEst(:,:,:,9), NdepthEst(:,:,:,18), NdepthEst(:,:,:,27)]);
 implay([imgs, NdepthEst]); %Play as video
