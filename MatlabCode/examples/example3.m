@@ -1,9 +1,18 @@
+function [] = example3(filename, begFrame, endFrame)
+
 %EXAMPLE3 This example shows how to use depth transfer on an input sequence
 %         with a zooming camera (variable focal length) and moving objects
 %
 % NOTE: Running this script can take up to 8GB of RAM!
 %
 %%%%%%%%%%%   Begin example3   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+fprintf('begin');
+
+fprintf('inputfilename  %s\n', filename);
+fprintf('beginining frame index %d\n', begFrame);
+fprintf('ending frame index %d\n', endFrame);
+
 addpath('..'); %Add the root of depthTransfer to the path
 
 %% Initialize a new project (sets up paths, parameters, etc)
@@ -18,7 +27,7 @@ add_training_data(project); %Look here for details on creating traing data
 fprintf('done. [%6.02fs]\n', toc(prepTrainTime));
 
 %% Create test data for example3
-readerObj = VideoReader(fullfile('example3_data', 'Glassboy-HD.mp4'));
+readerObj = VideoReader(fullfile('/videos', filename));
 %writerObj = VideoWriter('C:\Users\alebios2\Documents\depthtransfer\MatlabCode\Glassboy-HD.avi','Uncompressed AVI');
 
 %open AVI file for writing
@@ -26,7 +35,7 @@ readerObj = VideoReader(fullfile('example3_data', 'Glassboy-HD.mp4'));
 fprintf('num frames [%d]\n', readerObj.NumberOfFrames);
 %read and write each frame
 imgExample3Cell = cell(numel(readerObj.NumberOfFrames),1); %Initialize image cell
-for k = 1:40%readerObj.NumberOfFrames
+for k = begFrame:endFrame%readerObj.NumberOfFrames
    img = read(readerObj,k);
    imgExample3Cell{k} = im2double(img);
    %writeVideo(writerObj,img);
@@ -72,3 +81,4 @@ figure('Name','Input images and estimated depth'),
 %imshow([imgs(:,:,:,9), imgs(:,:,:,18), imgs(:,:,:,27); ...
 %        NdepthEst(:,:,:,9), NdepthEst(:,:,:,18), NdepthEst(:,:,:,27)]);
 implay([imgs, NdepthEst]); %Play as video
+end
